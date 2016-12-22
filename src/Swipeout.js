@@ -71,9 +71,9 @@ const Swipeout = React.createClass({
   _buttonsRightWidth: function() {
     let w = 0;
     const width = this.state.contentWidth;
-     if ( this.props.right && this.props.right.length ) {
+     if (this.props.right && this.props.right.length) {
        this.props.right.forEach(function(el) {
-         if( el.styleButton && el.styleButton.width )
+         if (el.styleButton && el.styleButton.width)
            w += el.styleButton.width;
          else
            w += width / 5;
@@ -87,10 +87,11 @@ const Swipeout = React.createClass({
       this.props.onOpen(this.props.sectionID, this.props.rowID);
     }
     this.refs.swipeoutContent.measure((ox, oy, width, height) => {
+      const btnsRightWidth = this._buttonsRightWidth();
       this.setState({
+        btnsRightWidth,
         btnWidth: (width/5),
         btnsLeftWidth: this.props.left ? (width/5)*this.props.left.length : 0,
-        btnsRightWidth: this.props.right ? (width/5)*this.props.right.length : 0,
         swiping: true,
         timeStart: (new Date()).getTime(),
       });
@@ -98,15 +99,15 @@ const Swipeout = React.createClass({
   },
 
   _handlePanResponderMove: function(e: Object, gestureState: Object) {
-    var posX = gestureState.dx;
-    var posY = gestureState.dy;
-    var leftWidth = this.state.btnsLeftWidth;
-    var rightWidth = this.state.btnsRightWidth;
-    if (this.state.openedRight) var posX = gestureState.dx - rightWidth;
-    else if (this.state.openedLeft) var posX = gestureState.dx + leftWidth;
+    let posX = gestureState.dx;
+    const posY = gestureState.dy;
+    const leftWidth = this.state.btnsLeftWidth;
+    const rightWidth = this.state.btnsRightWidth;
+    if (this.state.openedRight) posX = gestureState.dx - rightWidth;
+    else if (this.state.openedLeft) posX = gestureState.dx + leftWidth;
 
     //  prevent scroll if moveX is true
-    var moveX = Math.abs(posX) > Math.abs(posY);
+    const moveX = Math.abs(posX) > Math.abs(posY);
     if (this.props.scroll) {
       if (moveX) this.props.scroll(false);
       else this.props.scroll(true);
@@ -118,47 +119,29 @@ const Swipeout = React.createClass({
     }
   },
 
-  _openRightButton: function() {
-    this.refs.swipeoutContent.measure((ox, oy, width, height) => {
-      const btnsRightWidth = this._buttonsRightWidth();
-
-      this.setState({
-        btnWidth: (width/5),
-        btnsLeftWidth: this.props.left ? (width/5)*this.props.left.length : 0,
-        btnsRightWidth: btnsRightWidth,
-        contentHeight: height,
-        contentWidth: width,
-      });
-
-      // open swipeout right
-      this._tweenContent('contentPos', -btnsRightWidth);
-      this.setState({ contentPos: -btnsRightWidth, openedLeft: false, openedRight: true });
-    });
-  },
-
   _handlePanResponderEnd: function(e: Object, gestureState: Object) {
-    var posX = gestureState.dx;
-    var contentPos = this.state.contentPos;
-    var contentWidth = this.state.contentWidth;
-    var btnsLeftWidth = this.state.btnsLeftWidth;
-    var btnsRightWidth = this.state.btnsRightWidth;
+    const posX = gestureState.dx;
+    const contentPos = this.state.contentPos;
+    const contentWidth = this.state.contentWidth;
+    const btnsLeftWidth = this.state.btnsLeftWidth;
+    const btnsRightWidth = this.state.btnsRightWidth;
 
     //  minimum threshold to open swipeout
-    var openX = contentWidth*0.33;
+    const openX = contentWidth*0.33;
 
     //  should open swipeout
-    var openLeft = posX > openX || posX > btnsLeftWidth/2;
-    var openRight = posX < -openX || posX < -btnsRightWidth/2;
+    let openLeft = posX > openX || posX > btnsLeftWidth/2;
+    let openRight = posX < -openX || posX < -btnsRightWidth/2;
 
     //  account for open swipeouts
-    if (this.state.openedRight) var openRight = posX-openX < -openX;
-    if (this.state.openedLeft) var openLeft = posX+openX > openX;
+    if (this.state.openedRight) openRight = posX-openX < -openX;
+    if (this.state.openedLeft) openLeft = posX+openX > openX;
 
     //  reveal swipeout on quick swipe
-    var timeDiff = (new Date()).getTime() - this.state.timeStart < 200;
+    const timeDiff = (new Date()).getTime() - this.state.timeStart < 200;
     if (timeDiff) {
-      var openRight = posX < -openX/10 && !this.state.openedLeft;
-      var openLeft = posX > openX/10 && !this.state.openedRight;
+      openRight = posX < -openX/10 && !this.state.openedLeft;
+      openLeft = posX > openX/10 && !this.state.openedRight;
     }
 
     if (this.state.swiping) {
@@ -197,7 +180,7 @@ const Swipeout = React.createClass({
 
   //  close swipeout on button press
   _autoClose: function(btn) {
-    var onPress = btn.onPress;
+    const onPress = btn.onPress;
     if (onPress) onPress();
     if (this.state.autoClose) this._close();
   },
@@ -210,48 +193,61 @@ const Swipeout = React.createClass({
     });
   },
 
-  render: function() {
-    var contentWidth = this.state.contentWidth;
-    var posX = this.getTweeningValue('contentPos');
+  _openRightButton: function() {
+    this.refs.swipeoutContent.measure((ox, oy, width, height) => {
+      const btnsRightWidth = this._buttonsRightWidth();
 
-    var styleSwipeout = [styles.swipeout, this.props.style];
+      this.setState({
+        btnsRightWidth,
+        btnWidth: (width/5),
+        btnsLeftWidth: this.props.left ? (width/5)*this.props.left.length : 0,
+        contentHeight: height,
+        contentWidth: width,
+      });
+
+      // open swipeout right
+      this._tweenContent('contentPos', -btnsRightWidth);
+      this.setState({ contentPos: -btnsRightWidth, openedLeft: false, openedRight: true });
+    });
+  },
+
+  render: function() {
+    const contentWidth = this.state.contentWidth;
+    const posX = this.getTweeningValue('contentPos');
+
+    const styleSwipeout = [styles.swipeout, this.props.style];
     if (this.props.backgroundColor) {
       styleSwipeout.push([{ backgroundColor: this.props.backgroundColor }]);
     }
 
-    var limit = -this.state.btnsRightWidth;
-    if (posX > 0) var limit = this.state.btnsLeftWidth;
+    const limit = posX > 0 ? this.state.btnsLeftWidth : -this.state.btnsRightWidth;
 
-    var styleLeftPos = {
+    const styleLeftPos = {
       left: {
         left: 0,
         overflow: 'hidden',
         width: Math.min(limit*(posX/limit), limit),
       },
     };
-    var styleRightPos = {
+    const styleRightPos = {
       right: {
         left: Math.abs(contentWidth + Math.max(limit, posX)),
         right: 0,
       },
     };
-    var styleContentPos = {
+    const styleContentPos = {
       content: {
         left: this._rubberBandEasing(posX, limit),
       },
     };
 
-    var styleContent = [styles.swipeoutContent];
-    styleContent.push(styleContentPos.content);
+    const styleContent = [styles.swipeoutContent, styleContentPos.content];
+    const styleRight = [styles.swipeoutBtns, styleRightPos.right];
+    const styleLeft = [styles.swipeoutBtns, styleLeftPos.left];
 
-    var styleRight = [styles.swipeoutBtns];
-    styleRight.push(styleRightPos.right);
+    const isRightVisible = posX < 0;
+    const isLeftVisible = posX > 0;
 
-    var styleLeft = [styles.swipeoutBtns];
-    styleLeft.push(styleLeftPos.left);
-
-    var isRightVisible = posX < 0;
-    var isLeftVisible = posX > 0;
 
     return (
       <View style={styleSwipeout}>
@@ -269,7 +265,7 @@ const Swipeout = React.createClass({
   },
 
   _onLayout: function(event) {
-    var { width, height } = event.nativeEvent.layout;
+    const { width, height } = event.nativeEvent.layout;
     this.setState({
       contentWidth: width,
       contentHeight: height,
@@ -278,9 +274,11 @@ const Swipeout = React.createClass({
 
   _renderButtons: function(buttons, isVisible, style) {
     if (buttons && isVisible) {
-      return( <View style={style}>
-        { buttons.map(this._renderButton) }
-      </View>);
+      return ( 
+        <View style={style}>
+          { buttons.map(this._renderButton) }
+        </View>
+      );
     } else {
       return (
         <View/>
