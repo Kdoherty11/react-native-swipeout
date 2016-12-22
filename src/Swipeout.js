@@ -25,6 +25,7 @@ const Swipeout = React.createClass({
     style: View.propTypes.style,
     sensitivity: PropTypes.number,
     onRightButtonOpened: PropTypes.func,
+    onClose: PropTypes.func,
   },
 
   getDefaultProps: function() {
@@ -157,6 +158,7 @@ const Swipeout = React.createClass({
         this.setState({ contentPos: btnsLeftWidth, openedLeft: true, openedRight: false });
       } else {
         // close swipeout
+        this.props.onClose && this.props.onClose();
         this._tweenContent('contentPos', 0);
         this.setState({ contentPos: 0, openedLeft: false, openedRight: false });
       }
@@ -188,6 +190,7 @@ const Swipeout = React.createClass({
   },
 
   _close: function() {
+    this.props.onClose && this.props.onClose();
     this._tweenContent('contentPos', 0);
     this.setState({
       openedRight: false,
