@@ -193,7 +193,7 @@ const Swipeout = React.createClass({
     });
   },
 
-  _openRightButton: function() {
+  openRightButton: function() {
     this.refs.swipeoutContent.measure((ox, oy, width, height) => {
       const btnsRightWidth = this._buttonsRightWidth();
 
