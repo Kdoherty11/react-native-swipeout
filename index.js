@@ -1,2 +1,2 @@
-import Swipeout from './swipe_out/swipe_out'
+import Swipeout from './src/Swipeout'
 module.exports = Swipeout;
