@@ -189,7 +189,7 @@ const Swipeout = React.createClass({
     if (this.state.autoClose) this.close();
   },
 
-  _close: function() {
+  close: function() {
     this.props.onClose && this.props.onClose();
     this._tweenContent('contentPos', 0);
     this.setState({
