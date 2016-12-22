@@ -24,6 +24,7 @@ const Swipeout = React.createClass({
     scroll: PropTypes.func,
     style: View.propTypes.style,
     sensitivity: PropTypes.number,
+    onRightButtonOpened: PropTypes.func,
   },
 
   getDefaultProps: function() {
@@ -65,7 +66,7 @@ const Swipeout = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    if (nextProps.close) this._close();
+    if (nextProps.close) this.close();
   },
 
   _buttonsRightWidth: function() {
@@ -147,6 +148,7 @@ const Swipeout = React.createClass({
     if (this.state.swiping) {
       if (openRight && contentPos < 0 && posX < 0) {
         // open swipeout right
+        this.props.onRightButtonOpened && this.props.onRightButtonOpened();
         this._tweenContent('contentPos', -btnsRightWidth);
         this.setState({ contentPos: -btnsRightWidth, openedLeft: false, openedRight: true });
       } else if (openLeft && contentPos > 0 && posX > 0) {
@@ -182,7 +184,7 @@ const Swipeout = React.createClass({
   _autoClose: function(btn) {
     const onPress = btn.onPress;
     if (onPress) onPress();
-    if (this.state.autoClose) this._close();
+    if (this.state.autoClose) this.close();
   },
 
   _close: function() {
@@ -206,6 +208,7 @@ const Swipeout = React.createClass({
       });
 
       // open swipeout right
+      this.props.onRightButtonOpened && this.props.onRightButtonOpened();
       this._tweenContent('contentPos', -btnsRightWidth);
       this.setState({ contentPos: -btnsRightWidth, openedLeft: false, openedRight: true });
     });
